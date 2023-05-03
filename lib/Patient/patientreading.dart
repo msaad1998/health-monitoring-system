@@ -1,22 +1,30 @@
-// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_declarations, deprecated_member_use
+// ignore_for_file: library_private_types_in_public_api, unused_field, prefer_const_declarations
+
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class Reading extends StatefulWidget {
+  const Reading({super.key});
+
   @override
   _ReadingState createState() => _ReadingState();
 }
 
 class _ReadingState extends State<Reading> {
   List<Map<String, dynamic>> _dataList = [];
+  late Timer _timer;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _dataList = [];
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      await _readECGData();
+    });
   }
 
   Future<void> _readECGData() async {
@@ -25,7 +33,7 @@ class _ReadingState extends State<Reading> {
     });
 
     final url =
-        "https://healthmonitoringsystem-557b3-default-rtdb.firebaseio.com/all.json";
+        "https://healthmonitoringsystem-557b3-default-rtdb.firebaseio.com/values.json?orderBy=%22\$key%22&limitToLast=1";
 
     final response = await http.get(Uri.parse(url));
 
@@ -38,10 +46,12 @@ class _ReadingState extends State<Reading> {
           final spo2 = value["SpO2"]?.toStringAsFixed(3) ?? "NULL";
           final temperature =
               value["Temperature"]?.toStringAsFixed(3) ?? "NULL";
+          final heartrate = value["HeartRate"]?.toStringAsFixed(3) ?? "NULL";
           dataList.add({
             "ecg": ecg,
             "spo2": spo2,
             "temperature": temperature,
+            "heartrate": heartrate,
           });
         });
         setState(() {
@@ -55,6 +65,12 @@ class _ReadingState extends State<Reading> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _timer.cancel(); // Cancel the timer when the widget is disposed
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 184, 181, 182),
@@ -65,23 +81,6 @@ class _ReadingState extends State<Reading> {
         children: [
           const SizedBox(
             height: 10,
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              fixedSize: const Size(200, 60),
-              primary: const Color.fromARGB(255, 92, 100, 104),
-              shape: RoundedRectangleBorder(
-                  //to set border radius to button
-                  borderRadius: BorderRadius.circular(30)),
-            ),
-            onPressed: _isLoading ? null : _readECGData,
-            child: _isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(),
-                  )
-                : const Text('Readings'),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -99,27 +98,32 @@ class _ReadingState extends State<Reading> {
                     DataColumn(label: Text('ECG')),
                     DataColumn(label: Text('SpO2')),
                     DataColumn(label: Text('Temperature')),
+                    DataColumn(label: Text('HeartRate')),
                   ],
                   rows: _dataList
                       .map((data) => DataRow(cells: [
                             DataCell(
                               Text(
                                 data['ecg'],
-                                style: const TextStyle(fontSize: 25),
+                                style: const TextStyle(fontSize: 20),
                               ),
                             ),
                             DataCell(
                               Text(
                                 data['spo2'],
-                                style: const TextStyle(fontSize: 25),
+                                style: const TextStyle(fontSize: 20),
                               ),
                             ),
                             DataCell(
                               Text(
                                 data['temperature'],
-                                style: const TextStyle(fontSize: 25),
+                                style: const TextStyle(fontSize: 20),
                               ),
                             ),
+                            DataCell(Text(
+                              data['heartrate'],
+                              style: const TextStyle(fontSize: 20),
+                            ))
                           ]))
                       .toList(),
                 ),

@@ -68,14 +68,14 @@ class _PatientDashboardState extends State<PatientDashboard> {
                     PopupMenuItem(
                       child: TextButton(
                         child: const Text(
-                          'Medical history',
+                          'Readings',
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                         onPressed: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Reading()));
+                                  builder: (context) => const Reading()));
                         },
                       ),
                     ),

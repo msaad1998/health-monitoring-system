@@ -25,7 +25,7 @@ class _DocReadingState extends State<DocReading> {
     });
 
     final url =
-        "https://healthmonitoringsystem-557b3-default-rtdb.firebaseio.com/all.json";
+        "https://healthmonitoringsystem-557b3-default-rtdb.firebaseio.com/values.json";
 
     final response = await http.get(Uri.parse(url));
 
@@ -38,10 +38,12 @@ class _DocReadingState extends State<DocReading> {
           final spo2 = value["SpO2"]?.toStringAsFixed(3) ?? "NULL";
           final temperature =
               value["Temperature"]?.toStringAsFixed(3) ?? "NULL";
+          final heartrate = value["HeartRate"]?.toStringAsFixed(3) ?? "NULL";
           dataList.add({
             "ecg": ecg,
             "spo2": spo2,
             "temperature": temperature,
+            "heartrate": heartrate,
           });
         });
         setState(() {
@@ -99,6 +101,7 @@ class _DocReadingState extends State<DocReading> {
                     DataColumn(label: Text('ECG')),
                     DataColumn(label: Text('SpO2')),
                     DataColumn(label: Text('Temperature')),
+                    DataColumn(label: Text('HeartRate')),
                   ],
                   rows: _dataList
                       .map((data) => DataRow(cells: [
@@ -120,6 +123,10 @@ class _DocReadingState extends State<DocReading> {
                                 style: const TextStyle(fontSize: 25),
                               ),
                             ),
+                            DataCell(Text(
+                              data['heartrate'],
+                              style: const TextStyle(fontSize: 25),
+                            ))
                           ]))
                       .toList(),
                 ),

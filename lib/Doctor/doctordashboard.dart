@@ -67,7 +67,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                     PopupMenuItem(
                       child: TextButton(
                         child: const Text(
-                          'Change Email',
+                          'Reading',
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                         onPressed: () {

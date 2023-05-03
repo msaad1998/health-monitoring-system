@@ -40,6 +40,19 @@ class _CreateUserState extends State<CreateUser> {
           password: _passwordController.text.trim(),
         );
 
+        // Send a password reset email to the user
+        try {
+          await FirebaseAuth.instance.sendPasswordResetEmail(
+            email: _emailController.text.trim(),
+          );
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error sending password reset email: $e'),
+            ),
+          );
+        }
+
         await userCredential.user!.sendEmailVerification();
 
         final CollectionReference usersRef =
