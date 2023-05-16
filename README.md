@@ -1,6 +1,8 @@
 # health_monitoring_system
 
-A new Flutter project.
+This project contain three users admin patient and doctor.
+i have created role based login and i am monitoring vitals of patients and displating on this app.
+this app have all crud operation for account creation updation forget password fetching data from firebase realtime.
 
 ## Getting Started
 
