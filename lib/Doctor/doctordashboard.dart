@@ -2,7 +2,9 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:health_monitoring_system/Doctor/allocatebed.dart';
 import 'package:health_monitoring_system/Doctor/changedoctorpass.dart';
+import 'package:health_monitoring_system/Doctor/deallocatebed.dart';
 import 'package:health_monitoring_system/Doctor/doctorreading.dart';
 import 'package:health_monitoring_system/Doctor/updatedoctor.dart';
 import 'package:health_monitoring_system/Welcome/mainscreen.dart';
@@ -75,6 +77,34 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => DocReading()));
+                        },
+                      ),
+                    ),
+                    PopupMenuItem(
+                      child: TextButton(
+                        child: const Text(
+                          'Assign bed',
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AllocateBedPage()));
+                        },
+                      ),
+                    ),
+                    PopupMenuItem(
+                      child: TextButton(
+                        child: const Text(
+                          'Remove bed',
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AssignedBedsPage()));
                         },
                       ),
                     ),
