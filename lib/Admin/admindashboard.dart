@@ -4,7 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_monitoring_system/Admin/changeadminpass.dart';
 import 'package:health_monitoring_system/Admin/createuser.dart';
-import 'package:health_monitoring_system/Admin/hardwaremodule.dart';
+import 'package:health_monitoring_system/Admin/addhardwaremodule.dart';
+import 'package:health_monitoring_system/Admin/removehardwaremodule.dart';
 
 import 'package:health_monitoring_system/Welcome/mainscreen.dart';
 
@@ -35,7 +36,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       PopupMenuItem(
                         child: TextButton(
                           child: const Text(
-                            'ADD/Remove Hardware',
+                            'ADD Hardware',
                             style: TextStyle(color: Colors.white, fontSize: 20),
                           ),
                           onPressed: () {
@@ -43,7 +44,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => HardwareModule(),
+                                    builder: (context) => const AddHardwareModule(),
+                                  ));
+                            });
+                          },
+                        ),
+                      ),
+                      PopupMenuItem(
+                        child: TextButton(
+                          child: const Text(
+                            'REMOVE Hardware',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                          onPressed: () {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        RemoveHardwareModule(),
                                   ));
                             });
                           },

@@ -3,18 +3,18 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AssignedBedsPage extends StatefulWidget {
+class RemoveHardwareModule extends StatefulWidget {
   @override
-  _AssignedBedsPageState createState() => _AssignedBedsPageState();
+  _RemoveHardwareModuleState createState() => _RemoveHardwareModuleState();
 }
 
-class _AssignedBedsPageState extends State<AssignedBedsPage> {
+class _RemoveHardwareModuleState extends State<RemoveHardwareModule> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Assigned Beds'),
         backgroundColor: const Color.fromARGB(255, 184, 181, 182),
+        title: const Text('Assigned Hardware'),
       ),
       backgroundColor: const Color.fromARGB(255, 184, 181, 182),
       body: Padding(
@@ -31,7 +31,7 @@ class _AssignedBedsPageState extends State<AssignedBedsPage> {
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('users')
-                    .where('bedId', isNotEqualTo: '')
+                    .where('hardwareId', isNotEqualTo: '')
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -46,11 +46,11 @@ class _AssignedBedsPageState extends State<AssignedBedsPage> {
                     itemCount: patientList.length,
                     itemBuilder: (context, index) {
                       QueryDocumentSnapshot patient = patientList[index];
-                      String bedId = patient['bedId'];
+                      String hardwareId = patient['hardwareId'];
                       return FutureBuilder<DocumentSnapshot>(
                         future: FirebaseFirestore.instance
-                            .collection('bed')
-                            .doc(bedId)
+                            .collection('hardware')
+                            .doc(hardwareId)
                             .get(),
                         builder: (BuildContext context,
                             AsyncSnapshot<DocumentSnapshot> snapshot) {
@@ -62,22 +62,23 @@ class _AssignedBedsPageState extends State<AssignedBedsPage> {
                             return const Text('Loading...');
                           }
                           if (!snapshot.hasData || !snapshot.data!.exists) {
-                            return const Text('Bed not found');
+                            return const Text('Hardware not found');
                           }
-                          String bedName = snapshot.data!.get('bedName');
+                          String hardwareName =
+                              snapshot.data!.get('hardwareName');
                           return ListTile(
                             title: Text(patient['name']),
-                            subtitle:
-                                Text('Bed ID: $bedId, Bed Name: $bedName'),
+                            subtitle: Text(
+                                'Hardware ID: $hardwareId, Hardware Name: $hardwareName'),
                             trailing: ElevatedButton(
                               onPressed: () {
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                      title: const Text('Deallocate Bed'),
+                                      title: const Text('Remove Hardware'),
                                       content: Text(
-                                          'Are you sure you want to deallocate the bed from ${patient['name']}?'),
+                                          'Are you sure you want to remove the Hardware from ${patient['name']}?'),
                                       actions: [
                                         TextButton(
                                           onPressed: () async {
@@ -85,17 +86,17 @@ class _AssignedBedsPageState extends State<AssignedBedsPage> {
                                             await FirebaseFirestore.instance
                                                 .collection('users')
                                                 .doc(patient.id)
-                                                .update({'bedId': ''});
+                                                .update({'hardwareId': ''});
 
                                             // Update the bed document
                                             await FirebaseFirestore.instance
-                                                .collection('bed')
-                                                .doc(bedId)
+                                                .collection('hardware')
+                                                .doc(hardwareId)
                                                 .update({'isAvailable': true});
 
                                             Navigator.of(context).pop();
                                           },
-                                          child: const Text('Deallocate'),
+                                          child: const Text('Remove'),
                                         ),
                                         TextButton(
                                           onPressed: () {

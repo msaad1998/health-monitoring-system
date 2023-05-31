@@ -1,25 +1,27 @@
-// ignore_for_file: use_build_context_synchronously, use_key_in_widget_constructors, library_private_types_in_public_api
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AllocateBedPage extends StatefulWidget {
+class AddHardwareModule extends StatefulWidget {
+  const AddHardwareModule({super.key});
+
   @override
-  _AllocateBedPageState createState() => _AllocateBedPageState();
+  _AddHardwareModuleState createState() => _AddHardwareModuleState();
 }
 
-class _AllocateBedPageState extends State<AllocateBedPage> {
+class _AddHardwareModuleState extends State<AddHardwareModule> {
   Future<List<DocumentSnapshot>> getAvailablePatients() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('role', isEqualTo: 'Patient')
-        .where('bedId', isEqualTo: '')
+        .where('hardwareId', isEqualTo: '')
         .get();
     return querySnapshot.docs;
   }
 
   Future<void> assignBedToPatient(
-      DocumentSnapshot patient, DocumentSnapshot bed) async {
+      DocumentSnapshot patient, DocumentSnapshot hardware) async {
     // Assign bed to the patient
     String patientId = patient.id;
 
@@ -35,17 +37,18 @@ class _AllocateBedPageState extends State<AllocateBedPage> {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(patientId)
-          .update({'bedId': bed.id});
+          .update({'hardwareId': hardware.id});
 
-      // Update the selected bed's document
+      // Update the selected hardware's document
       await FirebaseFirestore.instance
-          .collection('bed')
-          .doc(bed.id)
+          .collection('hardware')
+          .doc(hardware.id)
           .update({'isAvailable': false});
 
       // Display a success message
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bed allocated to patient successfully')),
+        const SnackBar(
+            content: Text('Hardware allocated to patient successfully')),
       );
     } else {
       throw Exception('Patient document not found.');
@@ -56,7 +59,7 @@ class _AllocateBedPageState extends State<AllocateBedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Allocate Bed'),
+        title: const Text('Allocate Hardware'),
         backgroundColor: const Color.fromARGB(255, 184, 181, 182),
       ),
       backgroundColor: const Color.fromARGB(255, 184, 181, 182),
@@ -66,14 +69,14 @@ class _AllocateBedPageState extends State<AllocateBedPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Available Beds:',
+              'Available Hardware:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
-                    .collection('bed')
+                    .collection('hardware')
                     .where('isAvailable', isEqualTo: true)
                     .snapshots(),
                 builder: (BuildContext context,
@@ -84,13 +87,14 @@ class _AllocateBedPageState extends State<AllocateBedPage> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Text('Loading...');
                   }
-                  List<QueryDocumentSnapshot> bedList = snapshot.data!.docs;
+                  List<QueryDocumentSnapshot> hardwareList =
+                      snapshot.data!.docs;
                   return ListView.builder(
-                    itemCount: bedList.length,
+                    itemCount: hardwareList.length,
                     itemBuilder: (context, index) {
-                      QueryDocumentSnapshot bed = bedList[index];
+                      QueryDocumentSnapshot hardware = hardwareList[index];
                       return ListTile(
-                        title: Text(bed['bedName']),
+                        title: Text(hardware['hardwareName']),
                         trailing: ElevatedButton(
                           onPressed: () async {
                             // Get available patients
@@ -105,7 +109,7 @@ class _AllocateBedPageState extends State<AllocateBedPage> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       const ListTile(
-                                        title: Text('Assign Bed'),
+                                        title: Text('Assign hardware'),
                                       ),
                                       const Divider(),
                                       if (availablePatients.isNotEmpty)
@@ -115,7 +119,7 @@ class _AllocateBedPageState extends State<AllocateBedPage> {
                                             onTap: () async {
                                               Navigator.of(context).pop();
                                               await assignBedToPatient(
-                                                  patient, bed);
+                                                  patient, hardware);
                                             },
                                           );
                                         }).toList()
